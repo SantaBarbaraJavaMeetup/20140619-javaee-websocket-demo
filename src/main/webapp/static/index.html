@@ -1,0 +1,56 @@
+<html>
+
+<script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        var setupSection = $("#setupSection");
+        var joinButton = $("#joinButton");
+        var roomName = $("#roomName");
+        var memberName = $("#memberName");
+
+        var chatSection = $("#chatSection");
+        var conversationText = $("#conversationText");
+        var messageText = $("#messageText");
+        var sendButton = $("#sendButton");
+
+        var socket;
+
+        chatSection.hide();
+
+        sendButton.click(function() {
+            socket.send('[' + memberName.val() + ']: ' + messageText.val() + '\n');
+            messageText.val("");
+        });
+
+        joinButton.click(function() {
+            setupSection.hide();
+            chatSection.show();
+            socket = new WebSocket("ws://localhost:8080/chatrooms/" + roomName.val());
+            socket.onmessage = function(event) {
+                conversationText.val(conversationText.val() + event.data);
+            };
+        });
+    });
+</script>
+
+<body>
+
+<h2>Chat with WebSockets!</h2>
+
+<div id="setupSection">
+    <input type="text" placeholder="[Chatroom Name]" id="roomName"/>
+    <input type="text" placeholder="[Your Name]" id="memberName"/>
+    <input type="button" value="Join" id="joinButton"/>
+</div>
+
+<div id="chatSection">
+    <textarea rows="10" cols="50" readonly="readonly" id="conversationText"></textarea>
+    <p/>
+    <input type="text" placeholder="[Type a message]" id="messageText" style="width: 250px"/>
+    <input type="button" value="Send" id="sendButton"/>
+</div>
+
+</body>
+
+</html>
